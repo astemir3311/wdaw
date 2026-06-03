@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автошкола "Драйв" - Профессиональное обучение вождению</title>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ JS-СТИЛЕЙ (Заменяет CSS)
+        function setStyle(element, styles) {
+            for (let property in styles) {
+                element.style[property] = styles[property];
+            }
+            return element;
+        }
+
+        // ФУНКЦИЯ АНИМАЦИИ НА ЧИСТОМ JS (requestAnimationFrame)
+        function animateEntrance(element) {
+            let startTime = null;
+            const duration = 600;
+            const startY = 30;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const currentY = startY * (1 - ease);
+                const currentOpacity = ease;
+
+                element.style.transform = `translateY(${currentY}px)`;
+                element.style.opacity = currentOpacity;
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАЛЕНДАРЯ
+        let calendarDate = new Date();
+        let selectedDateStr = null;
+
+        // НАВИГАЦИЯ
+        function renderNav() {
+            const nav = document.createElement('nav');
+            setStyle(nav, {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '15px',
+                padding: '20px',
+                backgroundColor: '#0a0e1a',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                position: 'sticky',
+                top: '0',
+                zIndex: '1000',
+                flexWrap: 'wrap',
+                borderBottom: '2px solid #0066cc'
+            });
+
+            const logo = document.createElement('div');
+            logo.innerText = 'АВТОШКОЛА "ДРАЙВ"';
+            setStyle(logo, {
+                color: '#ffffff',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginRight: '30px',
+                letterSpacing: '1px'
+            });
+
+            const pages = ['Главная', 'Курсы', 'Инструкторы', 'Запись'];
+            const pageDiv = document.createElement('div');
+            setStyle(pageDiv, { display: 'flex', gap: '10px', flexWrap: 'wrap' });
+
+            pages.forEach((pageName, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = pageName;
+                setStyle(btn, {
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: index === 0 ? '#ffffff' : '#a0aec0',
+                    backgroundColor: index === 0 ? '#0066cc' : 'transparent',
+                    border: index === 0 ? 'none' : '1px solid #2d3748',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                });
+                
+                btn.onmouseover = () => {
+                    if (index !== 0) {
+                        btn.style.backgroundColor = '#1a202c';
+                        btn.style.color = '#ffffff';
+                        btn.style.borderColor = '#0066cc';
+                    }
+                };
+                btn.onmouseout = () => {
+                    if (index !== 0) {
+                        btn.style.backgroundColor = 'transparent';
+                        btn.style.color = '#a0aec0';
+                        btn.style.borderColor = '#2d3748';
+                    }
+                };
+                
+                btn.onclick = () => router(index);
+                pageDiv.appendChild(btn);
+            });
+
+            const contactInfo = document.createElement('div');
+            contactInfo.innerText = '+7 (999) 123-45-67';
+            setStyle(contactInfo, {
+                color: '#00d4ff',
+                fontSize: '15px',
+                fontWeight: '600',
+                marginLeft: '30px'
+            });
+
+            nav.appendChild(logo);
+            nav.appendChild(pageDiv);
+            nav.appendChild(contactInfo);
+            return nav;
+        }
+
+        // СТРАНИЦА: ГЛАВНАЯ
+        function renderHome() {
+            const container = document.createElement('div');
+
+            // HERO SECTION
+            const heroSection = document.createElement('section');
+            setStyle(heroSection, {
+                position: 'relative',
+                height: '500px',
+                backgroundImage: 'url("https://aviant.by/sites/default/files/new/Wide_aerial_view_of_Belarus_driving_examination_gr-1773414015753.jpg")',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '0px'
+            });
+
+            const heroOverlay = document.createElement('div');
+            setStyle(heroOverlay, {
+                position: 'absolute', top: '0', left: '0', right: '0', bottom: '0',
+                backgroundColor: 'rgba(10, 14, 26, 0.8)'
+            });
+
+            const heroContent = document.createElement('div');
+            setStyle(heroContent, {
+                position: 'relative', zIndex: '2', textAlign: 'center', color: '#ffffff', padding: '40px', maxWidth: '800px'
+            });
+
+            const heroTitle = document.createElement('h1');
+            heroTitle.innerText = 'НАУЧИМСЯ ВОДИТЬ УВЕРЕННО';
+            setStyle(heroTitle, { fontSize: '48px', fontWeight: 'bold', marginBottom: '20px', color: '#ffffff' });
+
+            const heroSubtitle = document.createElement('h2');
+            heroSubtitle.innerText = 'Профессиональное обучение вождению всех категорий';
+            setStyle(heroSubtitle, { fontSize: '22px', marginBottom: '30px', fontWeight: '400', color: '#cbd5e0' });
+
+            const heroButtons = document.createElement('div');
+            setStyle(heroButtons, { display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' });
+
+            const btnPrimary = document.createElement('button');
+            btnPrimary.innerText = 'Записаться на занятия';
+            setStyle(btnPrimary, {
+                padding: '14px 32px', fontSize: '16px', fontWeight: '600', backgroundColor: '#0066cc',
+                color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)'
+            });
+            btnPrimary.onmouseover = () => { btnPrimary.style.backgroundColor = '#0052a3'; btnPrimary.style.transform = 'translateY(-2px)'; };
+            btnPrimary.onmouseout = () => { btnPrimary.style.backgroundColor = '#0066cc'; btnPrimary.style.transform = 'translateY(0)'; };
+            btnPrimary.onclick = () => router(3);
+
+            const btnSecondary = document.createElement('button');
+            btnSecondary.innerText = 'Наши курсы';
+            setStyle(btnSecondary, {
+                padding: '14px 32px', fontSize: '16px', fontWeight: '600', backgroundColor: 'transparent',
+                color: '#ffffff', border: '2px solid #ffffff', borderRadius: '6px', cursor: 'pointer'
+            });
+            btnSecondary.onmouseover = () => { btnSecondary.style.backgroundColor = 'rgba(255,255,255,0.1)'; btnSecondary.style.transform = 'translateY(-2px)'; };
+            btnSecondary.onmouseout = () => { btnSecondary.style.backgroundColor = 'transparent'; btnSecondary.style.transform = 'translateY(0)'; };
+            btnSecondary.onclick = () => router(1);
+
+            heroButtons.appendChild(btnPrimary);
+            heroButtons.appendChild(btnSecondary);
+            heroContent.appendChild(heroTitle);
+            heroContent.appendChild(heroSubtitle);
+            heroContent.appendChild(heroButtons);
+            heroSection.appendChild(heroOverlay);
+            heroSection.appendChild(heroContent);
+            container.appendChild(heroSection);
+
+            // СЕКЦИЯ "О НАС" (НОВАЯ, ОБЪЕМНАЯ)
+            const aboutSection = document.createElement('section');
+            setStyle(aboutSection, { padding: '80px 20px', backgroundColor: '#0f1419', marginBottom: '0px' });
+
+            const aboutContainer = document.createElement('div');
+            setStyle(aboutContainer, { maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' });
+
+            const aboutImage = document.createElement('img');
+            aboutImage.src = 'https://www.auto-teach.ru/photo_gallery/g412016121076196b.jpg';
+            aboutImage.alt = 'Учебный процесс';
+            setStyle(aboutImage, { width: '100%', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)', border: '1px solid #2d3748' });
+
+            const aboutTextContent = document.createElement('div');
+            
+            const aboutTitle = document.createElement('h2');
+            aboutTitle.innerText = 'О НАШЕЙ АВТОШКОЛЕ';
+            setStyle(aboutTitle, { fontSize: '36px', color: '#ffffff', marginBottom: '25px', fontWeight: 'bold', borderBottom: '3px solid #0066cc', paddingBottom: '10px', display: 'inline-block' });
+
+            const p1 = document.createElement('p');
+            p1.innerText = 'Автошкола "Драйв" была основана в 2008 году с четкой миссией: сделать процесс обучения вождению безопасным, комфортным и максимально эффективным. За более чем 15 лет работы мы выпустили свыше 10 000 квалифицированных водителей, которые уверенно чувствуют себя на дорогах общего пользования. Мы не просто готовим к сдаче экзамена в ГИБДД, мы формируем культуру безопасного вождения.';
+            setStyle(p1, { fontSize: '16px', color: '#a0aec0', lineHeight: '1.7', marginBottom: '20px' });
+
+            const p2 = document.createElement('p');
+            p2.innerText = 'Наша методика обучения строится на принципе "от простого к сложному". Теоретические занятия проходят в современных мультимедийных классах с использованием интерактивных стендов и компьютерных тренажеров, что позволяет детально разобрать устройство автомобиля и правила дорожного движения. Практические занятия начинаются на закрытом, специально оборудованном автодроме, где вы отрабатываете базовые маневры без стресса от городского трафика, и только после уверенного освоения базы мы переходим к вождению в реальных городских условиях.';
+            setStyle(p2, { fontSize: '16px', color: '#a0aec0', lineHeight: '1.7', marginBottom: '20px' });
+
+            const p3 = document.createElement('p');
+            p3.innerText = 'Мы гордимся нашим автопарком, который регулярно обновляется. Все учебные автомобили оснащены дублирующими педалями, видеорегистраторами и системами климат-контроля, что создает максимально комфортные условия для обучения в любую погоду. Наши инструкторы проходят строгий отбор и регулярную аттестацию, обладая не только безупречным водительским стажем, но и навыками педагогической психологии.';
+            setStyle(p3, { fontSize: '16px', color: '#a0aec0', lineHeight: '1.7', marginBottom: '30px' });
+
+            const statsGrid = document.createElement('div');
+            setStyle(statsGrid, { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' });
+
+            const stats = [
+                { num: '15+', label: 'Лет успешной работы' },
+                { num: '10 000+', label: 'Выпущенных водителей' },
+                { num: '98%', label: 'Сдачи экзамена с первого раза' }
+            ];
+
+            stats.forEach(stat => {
+                const statBox = document.createElement('div');
+                setStyle(statBox, { textAlign: 'center', padding: '20px', backgroundColor: '#1a202c', borderRadius: '8px', border: '1px solid #2d3748' });
+                
+                const statNum = document.createElement('div');
+                statNum.innerText = stat.num;
+                setStyle(statNum, { fontSize: '32px', fontWeight: 'bold', color: '#00d4ff', marginBottom: '8px' });
+                
+                const statLabel = document.createElement('div');
+                statLabel.innerText = stat.label;
+                setStyle(statLabel, { fontSize: '14px', color: '#cbd5e0' });
+                
+                statBox.appendChild(statNum);
+                statBox.appendChild(statLabel);
+                statsGrid.appendChild(statBox);
+            });
+
+            aboutTextContent.appendChild(aboutTitle);
+            aboutTextContent.appendChild(p1);
+            aboutTextContent.appendChild(p2);
+            aboutTextContent.appendChild(p3);
+            aboutTextContent.appendChild(statsGrid);
+
+            aboutContainer.appendChild(aboutImage);
+            aboutContainer.appendChild(aboutTextContent);
+            aboutSection.appendChild(aboutContainer);
+            container.appendChild(aboutSection);
+
+            // ПРЕИМУЩЕСТВА
+            const advantagesSection = document.createElement('section');
+            setStyle(advantagesSection, { padding: '80px 20px', backgroundColor: '#0a0e1a', marginBottom: '0px' });
+
+            const sectionTitle = document.createElement('h2');
+            sectionTitle.innerText = 'ПОЧЕМУ ВЫБИРАЮТ НАС';
+            setStyle(sectionTitle, { textAlign: 'center', fontSize: '36px', color: '#ffffff', marginBottom: '50px', fontWeight: 'bold' });
+
+            const advantagesGrid = document.createElement('div');
+            setStyle(advantagesGrid, { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', maxWidth: '1200px', margin: '0 auto' });
+
+            const advantages = [
+                { title: 'ОПЫТНЫЕ ИНСТРУКТОРЫ', desc: 'Стаж работы от 10 лет, профессиональный подход', img: 'https://static.tildacdn.com/tild3464-3462-4233-a534-633766363938/_161B8765.jpg' },
+                { title: 'СОВРЕМЕННЫЙ АВТОПАРК', desc: 'Новые автомобили 2020-2024 года', img: 'https://автошкола92.рф/wp-content/uploads/2016/10/DSC02548-1_min.jpg' },
+                { title: 'ГИБКИЙ ГРАФИК', desc: 'Занятия утром, днем и вечером', img: 'https://static.insales-cdn.com/images/articles/1/735/7201503/unnamed__76_.jpg' },
+                { title: 'ДОСТУПНЫЕ ЦЕНЫ', desc: 'Рассрочка платежа без процентов', img: 'https://www.auto-teach.ru/photo_gallery/g412016121076196b.jpg' },
+                { title: 'ГАРАНТИЯ КАЧЕСТВА', desc: '98 процентов наших учеников сдают с первого раза', img: 'https://static.tildacdn.com/tild3938-6637-4838-b162-323561643432/___2.jpg' },
+                { title: 'ОФИЦИАЛЬНАЯ ЛИЦЕНЗИЯ', desc: 'Лицензия на образовательную деятельность', img: 'https://startnn.ru/wp-content/uploads/2014/11/Litsenziya.jpg' }
+            ];
+
+            advantages.forEach(adv => {
+                const card = document.createElement('div');
+                setStyle(card, {
+                    backgroundColor: '#1a202c', borderRadius: '8px', overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', transition: 'transform 0.2s', cursor: 'default', border: '1px solid #2d3748'
+                });
+
+                const img = document.createElement('img');
+                img.src = adv.img; img.alt = adv.title;
+                setStyle(img, { width: '100%', height: '180px', objectFit: 'cover' });
+
+                const cardContent = document.createElement('div');
+                setStyle(cardContent, { padding: '25px', textAlign: 'center' });
+
+                const cardTitle = document.createElement('h3');
+                cardTitle.innerText = adv.title;
+                setStyle(cardTitle, { fontSize: '18px', color: '#00d4ff', marginBottom: '12px', fontWeight: 'bold', letterSpacing: '0.5px' });
+
+                const cardDesc = document.createElement('p');
+                cardDesc.innerText = adv.desc;
+                setStyle(cardDesc, { fontSize: '14px', color: '#a0aec0', lineHeight: '1.5' });
+
+                cardContent.appendChild(cardTitle);
+                cardContent.appendChild(cardDesc);
+                card.appendChild(img);
+                card.appendChild(cardContent);
+
+                card.onmouseover = () => { card.style.transform = 'translateY(-5px)'; };
+                card.onmouseout = () => { card.style.transform = 'translateY(0)'; };
+
+                advantagesGrid.appendChild(card);
+            });
+
+            advantagesSection.appendChild(sectionTitle);
+            advantagesSection.appendChild(advantagesGrid);
+            container.appendChild(advantagesSection);
+
+            // ОТЗЫВЫ (10 ШТУК)
+            const reviewsSection = document.createElement('section');
+            setStyle(reviewsSection, { padding: '80px 20px', backgroundColor: '#0f1419', marginBottom: '0px' });
+
+            const reviewsTitle = document.createElement('h2');
+            reviewsTitle.innerText = 'ОТЗЫВЫ НАШИХ УЧЕНИКОВ';
+            setStyle(reviewsTitle, { textAlign: 'center', fontSize: '36px', color: '#ffffff', marginBottom: '50px', fontWeight: 'bold' });
+
+            const reviewsGrid = document.createElement('div');
+            setStyle(reviewsGrid, { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '25px', maxWidth: '1400px', margin: '0 auto' });
+
+            const reviews = [
+                { name: 'Александр Петров', category: 'Категория B', text: 'Отличная автошкола. Инструктор очень терпеливый и профессиональный. Сдал экзамен с первого раза.', rating: '5.0', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+                { name: 'Мария Иванова', category: 'Категория A', text: 'Прошла обучение на мотоцикл. Очень понравилось отношение инструкторов и организация процесса.', rating: '5.0', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+                { name: 'Дмитрий Сидоров', category: 'Категория C', text: 'Обучался на грузовик. Практики было достаточно, теорию объясняли понятно. Теперь работаю водителем.', rating: '5.0', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+                { name: 'Елена Козлова', category: 'Категория B', text: 'Очень довольна обучением. Инструкторы внимательные, не кричат, все объясняют спокойно. Машины новые.', rating: '5.0', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+                { name: 'Андрей Волков', category: 'Категория D', text: 'Прошел переподготовку на автобус. Отличная школа, сильные инструкторы с большим опытом.', rating: '4.9', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+                { name: 'Ольга Новикова', category: 'Категория B', text: 'Училась на автоматической коробке. Все очень понравилось, сдала права с первого раза.', rating: '5.0', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+                { name: 'Игорь Морозов', category: 'Категория C', text: 'Хорошая автошкола, адекватные цены. Инструкторы знают свое дело. Обучение прошло быстро.', rating: '4.8', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+                { name: 'Анна Соколова', category: 'Категория A', text: 'Мечтала о мотоцикле и наконец-то получила права. Инструкторы супер, все объяснили и показали.', rating: '5.0', img: 'https://avatars.mds.yandex.net/i?id=de30cef3f8f5e4653bedb0e4e4b08286_l-4518571-images-thumbs&n=13' },
+
+            ];
+
+            reviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                setStyle(reviewCard, {
+                    backgroundColor: '#1a202c', padding: '25px', borderRadius: '8px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', border: '1px solid #2d3748'
+                });
+
+                const reviewHeader = document.createElement('div');
+                setStyle(reviewHeader, { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' });
+
+                const avatar = document.createElement('img');
+                avatar.src = review.img; avatar.alt = review.name;
+                setStyle(avatar, { width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #0066cc' });
+
+                const reviewInfo = document.createElement('div');
+                const reviewName = document.createElement('h4');
+                reviewName.innerText = review.name;
+                setStyle(reviewName, { fontSize: '16px', color: '#ffffff', fontWeight: 'bold', marginBottom: '4px' });
+
+                const reviewCat = document.createElement('p');
+                reviewCat.innerText = review.category;
+                setStyle(reviewCat, { fontSize: '13px', color: '#718096' });
+
+                reviewInfo.appendChild(reviewName);
+                reviewInfo.appendChild(reviewCat);
+                reviewHeader.appendChild(avatar);
+                reviewHeader.appendChild(reviewInfo);
+
+                const reviewRating = document.createElement('div');
+                reviewRating.innerText = 'Рейтинг: ' + review.rating;
+                setStyle(reviewRating, { fontSize: '14px', color: '#00d4ff', marginBottom: '12px', fontWeight: '600' });
+
+                const reviewText = document.createElement('p');
+                reviewText.innerText = review.text;
+                setStyle(reviewText, { fontSize: '14px', color: '#a0aec0', lineHeight: '1.6', fontStyle: 'italic' });
+
+                reviewCard.appendChild(reviewHeader);
+                reviewCard.appendChild(reviewRating);
+                reviewCard.appendChild(reviewText);
+                reviewsGrid.appendChild(reviewCard);
+            });
+
+            reviewsSection.appendChild(reviewsTitle);
+            reviewsSection.appendChild(reviewsGrid);
+            container.appendChild(reviewsSection);
+
+            return container;
+        }
+
+        // СТРАНИЦА: КУРСЫ
+        function renderCourses() {
+            const container = document.createElement('div');
+            setStyle(container, { padding: '40px 20px' });
+
+            const headerSection = document.createElement('div');
+            setStyle(headerSection, {
+                textAlign: 'center', marginBottom: '50px', padding: '40px',
+                backgroundImage: 'url("https://carsweek.ru/upload/2022/Май/27/4.jpg")',
+                backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '8px',
+                position: 'relative', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+            });
+
+            const headerOverlay = document.createElement('div');
+            setStyle(headerOverlay, { position: 'absolute', top: '0', left: '0', right: '0', bottom: '0', backgroundColor: 'rgba(10, 14, 26, 0.85)', borderRadius: '8px' });
+
+            const headerContent = document.createElement('div');
+            setStyle(headerContent, { position: 'relative', zIndex: '2', color: '#ffffff' });
+
+            const headerTitle = document.createElement('h1');
+            headerTitle.innerText = 'УЧЕБНЫЕ ПРОГРАММЫ И КАТЕГОРИИ';
+            setStyle(headerTitle, { fontSize: '36px', fontWeight: 'bold', marginBottom: '15px', color: '#ffffff' });
+
+            const headerSubtitle = document.createElement('p');
+            headerSubtitle.innerText = 'Выберите подходящую категорию и начните обучение уже сегодня';
+            setStyle(headerSubtitle, { fontSize: '18px', color: '#cbd5e0' });
+
+            headerContent.appendChild(headerTitle);
+            headerContent.appendChild(headerSubtitle);
+            headerSection.appendChild(headerOverlay);
+            headerSection.appendChild(headerContent);
+            container.appendChild(headerSection);
+
+            const coursesGrid = document.createElement('div');
+            setStyle(coursesGrid, { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px', maxWidth: '1400px', margin: '0 auto' });
+
+            const courses = [
+                { cat: 'A', name: 'МОТОЦИКЛЫ', price: '15 000 руб.', duration: '2 месяца', hours: '18 ч. теории + 18 ч. практики', features: ['Обучение с нуля', 'Свой мотодром', 'Предоставляем экипировку'], image: 'https://avatars.mds.yandex.net/get-autoru-vos/16135405/4b0b86838f09ec709716cd58042bddcc/1200x900', color: '#0066cc' },
+                { cat: 'B', name: 'ЛЕГКОВЫЕ АВТО', price: '35 000 руб.', duration: '3-4 месяца', hours: '130 ч. теории + 56 ч. практики', features: ['МКПП и АКПП', 'Современные авто', 'Рассрочка 0 процентов'], image: 'https://avatars.mds.yandex.net/get-autoru-vos/17038387/c6f11aeef00629f584927ed0f5edc233/1200x900', color: '#0052a3' },
+                { cat: 'C', name: 'ГРУЗОВЫЕ АВТО', price: '45 000 руб.', duration: '3 месяца', hours: '112 ч. теории + 40 ч. практики', features: ['Грузовики до 7.5 тонн', 'Помощь в трудоустройстве', 'Переподготовка'], image: 'https://avatars.mds.yandex.net/i?id=506668ffa1cb15f769784fd50992dfb0_l-4080060-images-thumbs&n=13    ', color: '#0066cc' },
+                { cat: 'D', name: 'АВТОБУСЫ', price: '55 000 руб.', duration: '3-4 месяца', hours: '112 ч. теории + 40 ч. практики', features: ['Пассажирские перевозки', 'Гарантия трудоустройства', 'Категория D и DE'], image: 'https://www.nemanbus.ru/wp-content/uploads/2025/10/akoy-avtobus-vybrat-v-2025-godu.jpg', color: '#0052a3' },
+                { cat: 'BE', name: 'С ПРИЦЕПОМ (B)', price: '25 000 руб.', duration: '1 месяц', hours: '20 ч. теории + 16 ч. практики', features: ['Для категории B', 'Короткий курс', 'Интенсив'], image: 'https://a.d-cd.net/9ab370es-960.jpg', color: '#0066cc' },
+                { cat: 'CE', name: 'С ПРИЦЕПОМ (C)', price: '35 000 руб.', duration: '1.5 месяца', hours: '36 ч. теории + 24 ч. практики', features: ['Для категории C', 'Седельные прицепы', 'Международные перевозки'], image: 'https://avatars.mds.yandex.net/get-autoru-vos/1701598/a844991fc925fcca78856972b41a7f7f/1200x900', color: '#0052a3' }
+            ];
+
+            courses.forEach(course => {
+                const card = document.createElement('div');
+                setStyle(card, {
+                    backgroundColor: '#1a202c', borderRadius: '8px', overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', transition: 'all 0.2s', border: '1px solid #2d3748'
+                });
+
+                const imgContainer = document.createElement('div');
+                setStyle(imgContainer, { position: 'relative', height: '200px', overflow: 'hidden' });
+
+                const img = document.createElement('img');
+                img.src = course.image; img.alt = course.name;
+                setStyle(img, { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' });
+
+                const catBadge = document.createElement('div');
+                catBadge.innerText = 'Категория ' + course.cat;
+                setStyle(catBadge, {
+                    position: 'absolute', top: '15px', right: '15px', backgroundColor: course.color,
+                    color: '#ffffff', padding: '8px 16px', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold'
+                });
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(catBadge);
+
+                const cardContent = document.createElement('div');
+                setStyle(cardContent, { padding: '25px' });
+
+                const cardTitle = document.createElement('h3');
+                cardTitle.innerText = course.name;
+                setStyle(cardTitle, { fontSize: '20px', color: '#ffffff', marginBottom: '15px', fontWeight: 'bold' });
+
+                const priceRow = document.createElement('div');
+                setStyle(priceRow, { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', paddingBottom: '15px', borderBottom: '1px solid #2d3748' });
+
+                const price = document.createElement('div');
+                price.innerText = course.price;
+                setStyle(price, { fontSize: '24px', fontWeight: 'bold', color: '#00d4ff' });
+
+                const duration = document.createElement('div');
+                duration.innerText = course.duration;
+                setStyle(duration, { fontSize: '14px', color: '#a0aec0', backgroundColor: '#0f1419', padding: '6px 12px', borderRadius: '4px', border: '1px solid #2d3748' });
+
+                priceRow.appendChild(price);
+                priceRow.appendChild(duration);
+
+                const hours = document.createElement('p');
+                hours.innerText = course.hours;
+                setStyle(hours, { fontSize: '14px', color: '#718096', marginBottom: '15px', fontStyle: 'italic' });
+
+                const featuresTitle = document.createElement('h4');
+                featuresTitle.innerText = 'Что включено:';
+                setStyle(featuresTitle, { fontSize: '15px', color: '#ffffff', marginBottom: '10px', fontWeight: '600' });
+
+                const featuresList = document.createElement('ul');
+                setStyle(featuresList, { listStyle: 'none', padding: '0', margin: '0 0 20px 0' });
+
+                course.features.forEach(feature => {
+                    const li = document.createElement('li');
+                    li.innerText = '- ' + feature;
+                    setStyle(li, { fontSize: '14px', color: '#a0aec0', marginBottom: '6px', paddingLeft: '10px' });
+                    featuresList.appendChild(li);
+                });
+
+                const enrollBtn = document.createElement('button');
+                enrollBtn.innerText = 'Записаться на курс';
+                setStyle(enrollBtn, {
+                    width: '100%', padding: '12px', fontSize: '15px', fontWeight: '600',
+                    backgroundColor: '#0066cc', color: '#ffffff', border: 'none', borderRadius: '6px',
+                    cursor: 'pointer', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                });
+
+                enrollBtn.onmouseover = () => { enrollBtn.style.transform = 'translateY(-2px)'; enrollBtn.style.backgroundColor = '#0052a3'; };
+                enrollBtn.onmouseout = () => { enrollBtn.style.transform = 'translateY(0)'; enrollBtn.style.backgroundColor = '#0066cc'; };
+                enrollBtn.onclick = () => router(3);
+
+                cardContent.appendChild(cardTitle);
+                cardContent.appendChild(priceRow);
+                cardContent.appendChild(hours);
+                cardContent.appendChild(featuresTitle);
+                cardContent.appendChild(featuresList);
+                cardContent.appendChild(enrollBtn);
+
+                card.appendChild(imgContainer);
+                card.appendChild(cardContent);
+
+                card.onmouseover = () => { card.style.transform = 'translateY(-5px)'; card.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.3)'; img.style.transform = 'scale(1.05)'; };
+                card.onmouseout = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.2)'; img.style.transform = 'scale(1)'; };
+
+                coursesGrid.appendChild(card);
+            });
+
+            container.appendChild(coursesGrid);
+            return container;
+        }
+
+        // СТРАНИЦА: ИНСТРУКТОРЫ (12 ЧЕЛОВЕК)
+        function renderInstructors() {
+            const container = document.createElement('div');
+            setStyle(container, { padding: '40px 20px' });
+
+            const headerSection = document.createElement('div');
+            setStyle(headerSection, {
+                textAlign: 'center', marginBottom: '50px', padding: '40px',
+                backgroundImage: 'url("https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=1200&h=400&fit=crop")',
+                backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '8px',
+                position: 'relative', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+            });
+
+            const headerOverlay = document.createElement('div');
+            setStyle(headerOverlay, { position: 'absolute', top: '0', left: '0', right: '0', bottom: '0', backgroundColor: 'rgba(10, 14, 26, 0.85)', borderRadius: '8px' });
+
+            const headerContent = document.createElement('div');
+            setStyle(headerContent, { position: 'relative', zIndex: '2', color: '#ffffff' });
+
+            const headerTitle = document.createElement('h1');
+            headerTitle.innerText = 'НАШИ ИНСТРУКТОРЫ';
+            setStyle(headerTitle, { fontSize: '36px', fontWeight: 'bold', marginBottom: '15px', color: '#ffffff' });
+
+            const headerSubtitle = document.createElement('p');
+            headerSubtitle.innerText = 'Профессионалы с многолетним опытом. Выберите своего инструктора';
+            setStyle(headerSubtitle, { fontSize: '18px', color: '#cbd5e0' });
+
+            headerContent.appendChild(headerTitle);
+            headerContent.appendChild(headerSubtitle);
+            headerSection.appendChild(headerOverlay);
+            headerSection.appendChild(headerContent);
+            container.appendChild(headerSection);
+
+            const instructorsGrid = document.createElement('div');
+            setStyle(instructorsGrid, { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', maxWidth: '1400px', margin: '0 auto' });
+
+            const instructors = [
+                { name: 'Александр Петров', category: 'Категории A, B', rating: 5.0, reviews: 127, experience: '12 лет', description: 'Специализация: мотоциклы и легковые авто. Спокойный и терпеливый подход.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face', color: '#0066cc' },
+                { name: 'Сергей Волков', category: 'Категория B', rating: 4.9, reviews: 203, experience: '15 лет', description: 'Обучаю на механике и автомате. 98 процентов сдачи с первого раза.', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face', color: '#0052a3' },
+                { name: 'Дмитрий Соколов', category: 'Категории C, D', rating: 5.0, reviews: 89, experience: '18 лет', description: 'Грузовики и автобусы. Бывший водитель-дальнобойщик.', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face', color: '#0066cc' },
+                { name: 'Андрей Морозов', category: 'Категория B', rating: 4.8, reviews: 156, experience: '10 лет', description: 'Индивидуальный подход к каждому ученику. Обучение с нуля.', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face', color: '#0052a3' },
+                { name: 'Михаил Новиков', category: 'Категория A', rating: 5.0, reviews: 94, experience: '8 лет', description: 'Мотоциклист со стажем 20 лет. Обучаю безопасной езде.', image: 'https://images.unsplash.com/photo-1504257432389-5c08e2ea5c8c?w=400&h=400&fit=crop&crop=face', color: '#0066cc' },
+                { name: 'Игорь Павлов', category: 'Категории B, BE', rating: 4.9, reviews: 178, experience: '14 лет', description: 'Специализация: вождение с прицепом. Подготовка к категории BE.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face', color: '#0052a3' },
+                { name: 'Владимир Козлов', category: 'Категория C', rating: 4.8, reviews: 112, experience: '16 лет', description: 'Грузовые перевозки. Помогаю с трудоустройством после обучения.', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face', color: '#0066cc' },
+                { name: 'Николай Васильев', category: 'Категория D', rating: 5.0, reviews: 76, experience: '20 лет', description: 'Пассажирские перевозки. Опыт работы в крупном автопарке.', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face', color: '#0052a3' },
+            ];
+
+            instructors.forEach(instructor => {
+                const card = document.createElement('div');
+                setStyle(card, {
+                    backgroundColor: '#1a202c', borderRadius: '8px', overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', transition: 'all 0.2s', cursor: 'pointer', border: '1px solid #2d3748'
+                });
+
+                const imgContainer = document.createElement('div');
+                setStyle(imgContainer, { position: 'relative', height: '280px', overflow: 'hidden' });
+
+                const img = document.createElement('img');
+                img.src = instructor.image; img.alt = instructor.name;
+                setStyle(img, { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' });
+
+                const ratingBadge = document.createElement('div');
+                ratingBadge.innerText = 'Рейтинг: ' + instructor.rating;
+                setStyle(ratingBadge, {
+                    position: 'absolute', top: '15px', right: '15px', backgroundColor: '#0066cc',
+                    color: '#ffffff', padding: '6px 12px', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold'
+                });
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(ratingBadge);
+
+                const cardContent = document.createElement('div');
+                setStyle(cardContent, { padding: '25px' });
+
+                const nameEl = document.createElement('h3');
+                nameEl.innerText = instructor.name;
+                setStyle(nameEl, { fontSize: '20px', color: '#ffffff', marginBottom: '8px', fontWeight: 'bold' });
+
+                const categoryEl = document.createElement('p');
+                categoryEl.innerText = instructor.category;
+                setStyle(categoryEl, { fontSize: '14px', color: '#00d4ff', marginBottom: '12px', fontWeight: '600' });
+
+                const statsDiv = document.createElement('div');
+                setStyle(statsDiv, { display: 'flex', gap: '20px', marginBottom: '15px', flexWrap: 'wrap' });
+
+                const expDiv = document.createElement('div');
+                expDiv.innerText = 'Стаж: ' + instructor.experience;
+                setStyle(expDiv, { fontSize: '13px', color: '#a0aec0' });
+
+                const reviewsDiv = document.createElement('div');
+                reviewsDiv.innerText = instructor.reviews + ' отзывов';
+                setStyle(reviewsDiv, { fontSize: '13px', color: '#a0aec0' });
+
+                statsDiv.appendChild(expDiv);
+                statsDiv.appendChild(reviewsDiv);
+
+                const descEl = document.createElement('p');
+                descEl.innerText = instructor.description;
+                setStyle(descEl, { fontSize: '14px', color: '#718096', lineHeight: '1.6', marginBottom: '20px', fontStyle: 'italic' });
+
+                const selectBtn = document.createElement('button');
+                selectBtn.innerText = 'Записаться к инструктору';
+                setStyle(selectBtn, {
+                    width: '100%', padding: '12px', fontSize: '15px', fontWeight: '600',
+                    backgroundColor: instructor.color, color: '#ffffff', border: 'none', borderRadius: '6px',
+                    cursor: 'pointer', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                });
+
+                selectBtn.onmouseover = () => { selectBtn.style.transform = 'translateY(-2px)'; selectBtn.style.backgroundColor = '#0052a3'; };
+                selectBtn.onmouseout = () => { selectBtn.style.transform = 'translateY(0)'; selectBtn.style.backgroundColor = instructor.color; };
+                selectBtn.onclick = () => {
+                    try { localStorage.setItem('selectedInstructor', instructor.name); } catch(e) {}
+                    router(3);
+                };
+
+                cardContent.appendChild(nameEl);
+                cardContent.appendChild(categoryEl);
+                cardContent.appendChild(statsDiv);
+                cardContent.appendChild(descEl);
+                cardContent.appendChild(selectBtn);
+
+                card.appendChild(imgContainer);
+                card.appendChild(cardContent);
+
+                card.onmouseover = () => { card.style.transform = 'translateY(-5px)'; card.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.3)'; img.style.transform = 'scale(1.05)'; };
+                card.onmouseout = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.2)'; img.style.transform = 'scale(1)'; };
+
+                instructorsGrid.appendChild(card);
+            });
+
+            container.appendChild(instructorsGrid);
+            return container;
+        }
+
+        // ФУНКЦИЯ ОТРИСОВКИ РАБОЧЕГО КАЛЕНДАРЯ
+        function renderCalendarGrid(containerElement) {
+            containerElement.innerHTML = '';
+            
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            
+            const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            
+            // Обновляем заголовок месяца
+            const monthYearEl = document.getElementById('calendar-month-year');
+            if (monthYearEl) {
+                monthYearEl.innerText = monthNames[month] + ' ' + year;
+            }
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            let firstDay = new Date(year, month, 1).getDay();
+            firstDay = firstDay === 0 ? 6 : firstDay - 1; // Делаем понедельник первым днем (0)
+
+            const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            daysOfWeek.forEach(day => {
+                const d = document.createElement('div');
+                d.innerText = day;
+                setStyle(d, { textAlign: 'center', fontWeight: 'bold', color: '#a0aec0', padding: '12px 0', fontSize: '14px' });
+                containerElement.appendChild(d);
+            });
+
+            // Пустые ячейки до первого дня месяца
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                containerElement.appendChild(emptyCell);
+            }
+
+            // Дни месяца
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.innerText = i;
+                
+                const dayOfWeek = new Date(year, month, i).getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                
+                setStyle(dayCell, {
+                    padding: '15px 0', textAlign: 'center',
+                    backgroundColor: isWeekend ? '#2d3748' : '#0f1419',
+                    borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold',
+                    color: '#a0aec0', transition: 'all 0.2s', fontSize: '14px', border: '1px solid #2d3748'
+                });
+
+                dayCell.onmouseover = () => {
+                    if (dayCell.style.backgroundColor !== '#0066cc') {
+                        dayCell.style.backgroundColor = isWeekend ? '#4a5568' : '#2d3748';
+                        dayCell.style.transform = 'scale(1.05)';
+                        dayCell.style.color = '#ffffff';
+                    }
+                };
+                dayCell.onmouseout = () => {
+                    if (dayCell.style.backgroundColor !== '#0066cc') {
+                        dayCell.style.backgroundColor = isWeekend ? '#2d3748' : '#0f1419';
+                        dayCell.style.transform = 'scale(1)';
+                        dayCell.style.color = '#a0aec0';
+                    }
+                };
+
+                dayCell.onclick = () => {
+                    // Сброс всех ячеек
+                    const cells = containerElement.querySelectorAll('div');
+                    cells.forEach(child => {
+                        if (child.innerText >= '1' && child.innerText <= '31') {
+                            const cellDay = parseInt(child.innerText);
+                            const cellDayOfWeek = new Date(year, month, cellDay).getDay();
+                            const cellIsWeekend = cellDayOfWeek === 0 || cellDayOfWeek === 6;
+                            child.style.backgroundColor = cellIsWeekend ? '#2d3748' : '#0f1419';
+                            child.style.color = '#a0aec0';
+                        }
+                    });
+                    // Выделение выбранного
+                    dayCell.style.backgroundColor = '#0066cc';
+                    dayCell.style.color = '#ffffff';
+                    
+                    const formattedMonth = String(month + 1).padStart(2, '0');
+                    const formattedDay = String(i).padStart(2, '0');
+                    selectedDateStr = `${formattedDay}.${formattedMonth}.${year}`;
+                };
+
+                containerElement.appendChild(dayCell);
+            }
+        }
+
+        // СТРАНИЦА: КАЛЕНДАРЬ И ЗАПИСЬ
+        function renderSchedule() {
+            const container = document.createElement('div');
+            setStyle(container, { maxWidth: '1000px', margin: '0 auto', padding: '40px 20px' });
+
+            const headerSection = document.createElement('div');
+            setStyle(headerSection, {
+                textAlign: 'center', marginBottom: '50px', padding: '40px',
+                backgroundImage: 'url("https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=1200&h=400&fit=crop")',
+                backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '8px',
+                position: 'relative', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+            });
+
+            const headerOverlay = document.createElement('div');
+            setStyle(headerOverlay, { position: 'absolute', top: '0', left: '0', right: '0', bottom: '0', backgroundColor: 'rgba(10, 14, 26, 0.85)', borderRadius: '8px' });
+
+            const headerContent = document.createElement('div');
+            setStyle(headerContent, { position: 'relative', zIndex: '2', color: '#ffffff' });
+
+            const headerTitle = document.createElement('h1');
+            headerTitle.innerText = 'ЗАПИСЬ НА ПРАКТИЧЕСКОЕ ЗАНЯТИЕ';
+            setStyle(headerTitle, { fontSize: '36px', fontWeight: 'bold', marginBottom: '15px', color: '#ffffff' });
+
+            const headerSubtitle = document.createElement('p');
+            headerSubtitle.innerText = 'Выберите удобную дату и время для занятия с инструктором';
+            setStyle(headerSubtitle, { fontSize: '18px', color: '#cbd5e0' });
+
+            headerContent.appendChild(headerTitle);
+            headerContent.appendChild(headerSubtitle);
+            headerSection.appendChild(headerOverlay);
+            headerSection.appendChild(headerContent);
+            container.appendChild(headerSection);
+
+            let selectedInstructor = '';
+            try { selectedInstructor = localStorage.getItem('selectedInstructor') || ''; } catch(e) {}
+
+            if (selectedInstructor) {
+                const instructorInfo = document.createElement('div');
+                setStyle(instructorInfo, {
+                    backgroundColor: '#0066cc', padding: '16px', borderRadius: '6px',
+                    marginBottom: '30px', textAlign: 'center', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                });
+                instructorInfo.innerHTML = '<strong style="color: #ffffff; font-size: 16px;">Выбран инструктор: ' + selectedInstructor + '</strong>';
+                container.appendChild(instructorInfo);
+            }
+
+            const mainContent = document.createElement('div');
+            setStyle(mainContent, { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '35px' });
+
+            // КАЛЕНДАРЬ
+            const calendarSection = document.createElement('div');
+            setStyle(calendarSection, {
+                backgroundColor: '#1a202c', padding: '30px', borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', border: '1px solid #2d3748'
+            });
+
+            const calendarTitle = document.createElement('h2');
+            calendarTitle.innerText = 'Выберите дату';
+            setStyle(calendarTitle, { fontSize: '20px', color: '#ffffff', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' });
+
+            const calendarHeader = document.createElement('div');
+            setStyle(calendarHeader, { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' });
+
+            const prevBtn = document.createElement('button');
+            prevBtn.innerText = '<';
+            setStyle(prevBtn, { padding: '8px 14px', fontSize: '16px', backgroundColor: '#0066cc', color: '#ffffff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' });
+            prevBtn.onclick = () => {
+                calendarDate.setMonth(calendarDate.getMonth() - 1);
+                renderCalendarGrid(calendarGrid);
+            };
+
+            const monthYear = document.createElement('div');
+            monthYear.id = 'calendar-month-year';
+            setStyle(monthYear, { fontSize: '18px', fontWeight: 'bold', color: '#ffffff' });
+
+            const nextBtn = document.createElement('button');
+            nextBtn.innerText = '>';
+            setStyle(nextBtn, { padding: '8px 14px', fontSize: '16px', backgroundColor: '#0066cc', color: '#ffffff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' });
+            nextBtn.onclick = () => {
+                calendarDate.setMonth(calendarDate.getMonth() + 1);
+                renderCalendarGrid(calendarGrid);
+            };
+
+            calendarHeader.appendChild(prevBtn);
+            calendarHeader.appendChild(monthYear);
+            calendarHeader.appendChild(nextBtn);
+
+            const calendarGrid = document.createElement('div');
+            setStyle(calendarGrid, { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' });
+
+            calendarSection.appendChild(calendarTitle);
+            calendarSection.appendChild(calendarHeader);
+            calendarSection.appendChild(calendarGrid);
+            mainContent.appendChild(calendarSection);
+
+            // Отрисовываем календарь после добавления в DOM
+            setTimeout(() => {
+                renderCalendarGrid(calendarGrid);
+            }, 50);
+
+            // ФОРМА ЗАПИСИ
+            const formSection = document.createElement('div');
+            setStyle(formSection, {
+                backgroundColor: '#1a202c', padding: '30px', borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', border: '1px solid #2d3748'
+            });
+
+            const formTitle = document.createElement('h2');
+            formTitle.innerText = 'Ваши данные';
+            setStyle(formTitle, { fontSize: '20px', color: '#ffffff', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' });
+
+            const form = document.createElement('form');
+            setStyle(form, { display: 'flex', flexDirection: 'column', gap: '18px' });
+
+            const formGroups = [
+                { id: 'inp-name', label: 'Ваше имя', type: 'text', placeholder: 'Иван Иванов' },
+                { id: 'inp-phone', label: 'Телефон', type: 'tel', placeholder: '+7 (999) 123-45-67' },
+                { id: 'inp-email', label: 'Email', type: 'email', placeholder: 'example@mail.ru' }
+            ];
+
+            formGroups.forEach(group => {
+                const label = document.createElement('label');
+                label.innerText = group.label;
+                label.htmlFor = group.id;
+                setStyle(label, { fontSize: '14px', color: '#cbd5e0', fontWeight: '600', marginBottom: '5px', display: 'block' });
+
+                const input = document.createElement('input');
+                input.type = group.type;
+                input.id = group.id;
+                input.placeholder = group.placeholder;
+                setStyle(input, {
+                    padding: '12px', fontSize: '14px', border: '1px solid #2d3748', borderRadius: '4px',
+                    outline: 'none', width: '100%', boxSizing: 'border-box', backgroundColor: '#0f1419', color: '#ffffff'
+                });
+
+                input.onfocus = () => { input.style.borderColor = '#0066cc'; };
+                input.onblur = () => { input.style.borderColor = '#2d3748'; };
+
+                form.appendChild(label);
+                form.appendChild(input);
+            });
+
+            const categoryLabel = document.createElement('label');
+            categoryLabel.innerText = 'Категория';
+            setStyle(categoryLabel, { fontSize: '14px', color: '#cbd5e0', fontWeight: '600', marginBottom: '5px', display: 'block' });
+
+            const categorySelect = document.createElement('select');
+            setStyle(categorySelect, {
+                padding: '12px', fontSize: '14px', border: '1px solid #2d3748', borderRadius: '4px',
+                backgroundColor: '#0f1419', color: '#ffffff', width: '100%', boxSizing: 'border-box'
+            });
+
+            ['A - Мотоциклы', 'B - Легковые авто', 'C - Грузовые авто', 'D - Автобусы', 'BE - Легковые с прицепом', 'CE - Грузовые с прицепом'].forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat; opt.innerText = cat; opt.style.backgroundColor = '#1a202c';
+                categorySelect.appendChild(opt);
+            });
+
+            form.appendChild(categoryLabel);
+            form.appendChild(categorySelect);
+
+            const timeLabel = document.createElement('label');
+            timeLabel.innerText = 'Время занятия';
+            setStyle(timeLabel, { fontSize: '14px', color: '#cbd5e0', fontWeight: '600', marginBottom: '5px', display: 'block' });
+
+            const timeSelect = document.createElement('select');
+            setStyle(timeSelect, {
+                padding: '12px', fontSize: '14px', border: '1px solid #2d3748', borderRadius: '4px',
+                backgroundColor: '#0f1419', color: '#ffffff', width: '100%', boxSizing: 'border-box'
+            });
+
+            ['09:00 - 10:30', '11:00 - 12:30', '13:00 - 14:30', '15:00 - 16:30', '17:00 - 18:30', '19:00 - 20:30'].forEach(time => {
+                const opt = document.createElement('option');
+                opt.value = time; opt.innerText = time; opt.style.backgroundColor = '#1a202c';
+                timeSelect.appendChild(opt);
+            });
+
+            form.appendChild(timeLabel);
+            form.appendChild(timeSelect);
+
+            const submitBtn = document.createElement('button');
+            submitBtn.type = 'button';
+            submitBtn.innerText = 'Подтвердить запись';
+            setStyle(submitBtn, {
+                padding: '14px', fontSize: '16px', fontWeight: '600', color: '#ffffff',
+                backgroundColor: '#0066cc', border: 'none', borderRadius: '6px', cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', marginTop: '10px'
+            });
+
+            submitBtn.onmouseover = () => { submitBtn.style.backgroundColor = '#0052a3'; submitBtn.style.transform = 'translateY(-2px)'; };
+            submitBtn.onmouseout = () => { submitBtn.style.backgroundColor = '#0066cc'; submitBtn.style.transform = 'translateY(0)'; };
+
+            submitBtn.onclick = () => {
+                const name = document.getElementById('inp-name').value;
+                const phone = document.getElementById('inp-phone').value;
+                
+                if (!name || !phone || !selectedDateStr) {
+                    alert('Ошибка: Пожалуйста, заполните все обязательные поля и выберите дату в календаре.');
+                    return;
+                }
+                
+                const instructorText = selectedInstructor ? '\nИнструктор: ' + selectedInstructor : '';
+                
+                alert('ЗАПИСЬ УСПЕШНО СОЗДАНА!\n\nДата: ' + selectedDateStr + '\nВремя: ' + timeSelect.value + '\nКатегория: ' + categorySelect.value + '\nИмя: ' + name + '\nТелефон: ' + phone + instructorText + '\n\nНаш менеджер свяжется с вами для подтверждения.');
+            };
+
+            form.appendChild(submitBtn);
+            formSection.appendChild(formTitle);
+            formSection.appendChild(form);
+            mainContent.appendChild(formSection);
+
+            container.appendChild(mainContent);
+
+            const infoSection = document.createElement('div');
+            setStyle(infoSection, {
+                marginTop: '40px', padding: '30px', backgroundColor: '#0066cc', borderRadius: '8px',
+                color: '#ffffff', textAlign: 'center', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)'
+            });
+
+            const infoTitle = document.createElement('h3');
+            infoTitle.innerText = 'Остались вопросы?';
+            setStyle(infoTitle, { fontSize: '22px', marginBottom: '15px', fontWeight: 'bold', color: '#ffffff' });
+
+            const infoPhone = document.createElement('div');
+            infoPhone.innerText = '+7 (999) 123-45-67';
+            setStyle(infoPhone, { fontSize: '24px', fontWeight: 'bold', color: '#ffffff', marginBottom: '10px' });
+
+            const infoHours = document.createElement('p');
+            infoHours.innerText = 'Работаем ежедневно с 9:00 до 21:00';
+            setStyle(infoHours, { fontSize: '15px', color: '#cbd5e0' });
+
+            infoSection.appendChild(infoTitle);
+            infoSection.appendChild(infoPhone);
+            infoSection.appendChild(infoHours);
+            container.appendChild(infoSection);
+
+            return container;
+        }
+
+        // РОУТЕР
+        const app = document.getElementById('app');
+        
+        // Глобальные стили приложения через JS
+        app.style.fontFamily = "'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif";
+        app.style.color = "#e2e8f0";
+        app.style.margin = "0";
+        app.style.padding = "0";
+        app.style.backgroundColor = "#0a0e1a";
+        app.style.minHeight = "100vh";
+
+        let currentPageIndex = 0;
+
+        function router(pageIndex) {
+            currentPageIndex = pageIndex;
+            app.innerHTML = '';
+
+            app.appendChild(renderNav());
+
+            let pageContent;
+            if (pageIndex === 0) pageContent = renderHome();
+            else if (pageIndex === 1) pageContent = renderCourses();
+            else if (pageIndex === 2) pageContent = renderInstructors();
+            else if (pageIndex === 3) pageContent = renderSchedule();
+
+            const animWrapper = document.createElement('div');
+            setStyle(animWrapper, { opacity: '0', transform: 'translateY(40px)' });
+            
+            animWrapper.appendChild(pageContent);
+            app.appendChild(animWrapper);
+
+            animateEntrance(animWrapper);
+        }
+
+        router(0);
+    </script>
+</body>
+</html>
